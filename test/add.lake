@@ -1,0 +1,6 @@
+#AUTOTEST
+push float 2.5
+push float 3
+add
+
+dump

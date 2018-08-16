@@ -1,0 +1,88 @@
+#AUTOTEST
+
+# Where on the stack is the closure
+define mathInstance int 0
+
+# In case we want to create many instances, load this and dup' it
+define prototypeIndex int 1
+
+# Placeholder for function instance #1
+push function null
+
+# Push a prototype. This will not have a stack yet, call dup first
+function withstack Math
+{
+    dump string "Inside Math"
+    define Math_getConstant_idx int 0
+    define Math_mulWithConstant_idx int 1
+
+    function getConstant
+    {
+        dump string "Getting constant"
+
+        # Push return value
+        push int 11
+
+        # Test that we can use frame referencing in members
+        load rel 0
+        push int 11; eq assert "ERROR: Local reference to constant yields invalid value";
+    }
+
+    # This expects a param. It multiplies with getConstant and returns the result
+    function mulWithConstant
+    {
+        dump string "Multiplying with constant"
+
+        load abs Math_getConstant_idx; invoke
+        mul
+    }
+
+    dump string "Successfully constructed Math"
+}
+
+dump string "Making instance"
+
+# dup is required for withstack functions, since this creates a stack
+# for it with the current stack as the parent.
+dup
+
+# Save instance in local variable
+store abs mathInstance
+
+# Call constructor
+dump string "Calling ctor"
+load abs mathInstance; invoke
+
+# Switch stack so we can invoke member
+load abs mathInstance
+dump
+
+loadstack
+
+    # Invoke member
+    push int 3
+
+    # Notice that rel not right here, we need the absolute stack position; this is where the object members reside
+    load abs Math_mulWithConstant_idx; invoke
+
+    # Transfer mul result to parent stack (it is pop'ed later on because it's unused)
+    sink 1
+
+# Go back to the main stack
+unloadstack
+
+# Because we drop'ed ref person_age_idx above, updated age should be on stack
+dump string "Mul result:"
+dump
+
+push int 33 eq assert "ERROR: Unexpected final value"
+
+# To create yet another instance of Math, use this:
+#push ref prototypeIndex
+#dup; invoke
+
+# Clean up (function prototype and instance)
+pop 2
+
+# Should be empty
+dump stack

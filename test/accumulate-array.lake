@@ -1,0 +1,44 @@
+#AUTOTEST
+
+#-----------------------------------------------------------------------------
+# Sums an array of integers using "accumulate"
+#
+# An accumulator takes a binary function and applies it over the input,
+# reducing to a single result.
+#-----------------------------------------------------------------------------
+
+# Some random items to test top-relative addressing; these are never used
+push float 3.14159
+push int 1234
+push string "abcd"
+
+# Load into array using top-relative addressing
+push array 10
+push int 1; load -1; coll append
+push int 2; load -1; coll append
+push int 3; load -1; coll append
+push int 4; load -1; coll append
+push int 5; load -1; coll append
+
+# Load array as argument (note: here we test rel addressing in a
+# non-framed function => works the same)
+load rel 3
+
+# Value count (one array)
+push int 1
+
+# Initial value for accumulation. For summing, let's start with 0
+push int 0
+
+# Accumulator which adds
+function
+{
+    add
+}
+
+# Accumulate
+accumulate
+
+dump string "Accumulate-array-with-sum value:"
+dump
+push int 15 eq assert "ERROR: accumulate with sum failed"

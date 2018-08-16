@@ -1,0 +1,22 @@
+#AUTOTEST
+
+# This is a minimal test case for the GC. It pushes a literal and makes
+# a duplicate. It then gc's pop's and gc's again. Only the pinned object should remain.
+
+# Literal pinned object (never gc'ed)
+push int 789
+
+# Create a new copy
+dup
+
+# This shouldn't do anything, both objects live
+gc
+
+pop
+
+# This should now collect the dup
+gc
+
+# Stack should now only contain the pinned "789" value
+size; push int 1;
+eq; assert "Unexpected stack size"

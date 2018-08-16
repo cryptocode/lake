@@ -1,0 +1,39 @@
+{
+  "name": "language-lake",
+  "version": "1.0.0",
+  "private": false,
+  "author": {
+    "name": "Lake",
+    "email": "cryptocode@zolo.io"
+  },
+  "description": "Add syntax highlighting and snippets to Lake files in Atom",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cryptocode/lake.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.50.0"
+  },
+  "dependencies": {},
+  "readme": "Lake language support in Atom\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/cryptocode/lake/issues"
+  },
+  "homepage": "https://github.com/cryptocode/lake#readme",
+  "_id": "language-lake@1.0.0",
+  "_shasum": "3f52081dae91b891830e7dba63d90463c21feffe",
+  "_resolved": "file:../d-1151127-8258-nfhsov/package.tgz",
+  "_from": "../d-1151127-8258-nfhsov/package.tgz",
+  "_atomModuleCache": {
+    "version": 1,
+    "dependencies": [],
+    "extensions": {
+      ".json": [
+        "package.json"
+      ]
+    },
+    "folders": []
+  }
+}

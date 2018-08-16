@@ -1,0 +1,94 @@
+#AUTOTEST
+
+# This function lives at stack index 0
+function take4
+{
+    # A local variable at rel 1
+    push int 999
+    dump stack
+
+    # 4th param
+    load rel -1
+    dump
+
+    # 3rd param
+    load rel -2
+    dump
+
+    # 2nd param
+    load rel -3
+    dump
+
+    # 1th param
+    load rel -4
+    dump
+
+    load rel 0
+    dump string "first local: " dump; pop
+
+    # N params, which we pushed again to dump, so remove N*2 (+ the 999)
+
+    # These are DESTRUCTED eagerly with remove instead of pop, since
+    # we know we won't need them again.
+
+    # With remove, CRASHES (load rel-4 just loads a pointer, which means we're deleting twice)
+    # Not a Lake bug, but a bug in the assembly. Never use remove for loaded params.
+    pop 9
+}
+
+function minus
+{
+    # Stress the GC
+    dup;dup;dup;dup;dup;dup;dup;dup;dup;dup;
+    dup;dup;dup;dup;dup;dup;dup;dup;dup;dup;
+    pop 20
+
+    # We could just do sub right away, the params are in the
+    # right place. However, we demonstrate relative addressing
+    # where -2 is the first param and -1 is the last. This scheme
+    # allows for varargs where the first param (-1) is the number
+    # of args pushed.
+    load rel -1
+    load rel -2
+    sub
+
+    dump string "5-2="
+    dump
+
+    push int 3 eq assert "ERROR: Should be 3" # assert pops; all that remains now is the two args
+
+    # Remove the original params (pop instead of remove to test GC)
+    pop 2
+}
+
+function noargs
+{
+    push int 555
+
+    # Push the local
+    load rel 0
+
+    dump string "noargs have a local: "; dump
+
+    pop 2
+}
+
+# Push arguments and invoke
+push int 3
+push int 5
+push int 7
+push int 9
+load abs 0 invoke
+
+# 5-1
+push int 5
+push int 2
+load abs 1 invoke
+
+load abs 2 invoke
+
+# Remove the functions. Stack should be empty
+pop 3
+dump stack
+
+gc

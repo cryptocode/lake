@@ -1,0 +1,30 @@
+#AUTOTEST
+
+push umap 10
+
+push string "key1"
+push int 23
+load abs 0; coll put
+
+push string "key2"
+push int 24
+load abs 0; coll put
+
+push int 485
+push string "String value"
+load abs 0; coll put
+
+load abs 0; dump; pop
+
+push string "key1"; load abs 0; coll get
+dump string "Map value is"; dump; pop
+
+push int 485; load abs 0; coll get
+dump string "Map value is"; dump; pop
+
+push string "key2"; load abs 0; coll contains
+dump string "Does it contain key2?"; dump
+
+push bool true; eq; assert "Should contain key2"
+
+dump stack

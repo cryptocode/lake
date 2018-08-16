@@ -1,0 +1,18 @@
+#AUTOTEST
+
+# Run with --trace 5 to dump the parsed values
+
+define afloat float -40.4982840000219918847719381987139871498723598724598734598734512
+define bfloat float 43.4e-11
+define b2float float 3.4^-3
+define PI float 3.14159
+define cfloat float 0.3e11
+define planckLength float 1.616252e-35
+define planckTime float 5.39e-44
+define separated int 1_000_000
+define mystr string "abc"
+define mychar char 'a'
+
+# Redefinition, the VM never sees the 49
+define anint int 49
+define anint int 94817119183818813893656463783323482985791892871598613988883331

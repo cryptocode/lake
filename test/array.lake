@@ -1,0 +1,78 @@
+#AUTOTEST
+
+# Array test
+
+# Create two arrays with initial capacity of 10
+push array 10
+push array 10
+
+push int 5; load abs 0; coll append
+push string "Hello"; load abs 0; coll append
+
+# Show first and second item
+push int 0; load abs 0; coll get; dump
+push int 1; load abs 0; coll get; dump
+
+# Update the first item
+push int 0; push int 4; load abs 0; coll put
+
+# Dump all items in the array
+load abs 0; dump; pop
+
+# Show the size as well
+load abs 0; coll size; dump
+
+# Add stuff to second array
+push int 97; load abs 1; coll append
+push int 98; load abs 1; coll append
+push int 99; load abs 1; coll append
+
+# Add second array as an element to first array
+load abs 1; load abs 0; coll append
+
+# Does it contain a value?
+push string "Hello"
+load abs 0; coll contains
+dump string "Does it contain Hello?"; dump
+
+# Show the array
+dump string "-- Array with subarray"
+load abs 0; dump; pop
+
+# Load last item (subarray), and then last item from subarray (int 99) and validate
+push int 2
+push int 2 load abs 0; coll get
+coll get
+push int 99; eq; assert "Not 99"
+
+# Remove first item
+push int 0; load abs 0; coll del
+
+# Show the array again
+dump string "-- After deleting first item"
+load abs 0; dump; pop
+
+# Duplicate array (only shallow copy, so the reference to the subarray is there)
+load abs 0; dup
+dump string "Duplicate array:"; dump
+
+# Expand array to stack
+dump stack
+coll spread
+dump stack
+
+# Clear the array and show it
+dump string "-- After clearing the array"
+load abs 0; coll clear
+load abs 0; dump; pop
+
+# Clear and GC
+dump string "Clearing stack and GC'ing"
+clear
+
+dump freelist
+dump sweeplist
+gc
+dump string "After GC:"
+
+dump stackhierarchy

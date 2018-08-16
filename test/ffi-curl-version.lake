@@ -1,0 +1,126 @@
+#AUTOTEST
+# Test FFI parsing and calling
+
+# First stack entry is the FFI symbol array
+define symarray_idx int 0
+push array 10
+
+define structarray_idx int 1
+push array 10
+
+# Placeholder for the tm array
+define tm_result_idx int 2
+push array null
+
+# Load libcurl and alias as curl
+push string "curl"
+push string "libcurl"
+ffi lib
+
+# Alternative syntax
+#ffi lib "libcurl" curl
+
+# Current process (the interpreter)
+ffi lib "" lake
+
+ffi struct tm _sint _sint _sint _sint _sint _sint _sint _sint _sint _slong _ptr
+load abs structarray_idx; coll append
+
+# Instruct the VM to construct a libffi definition for curl_version
+# This also loads the symbol from libcurl
+# Symbol now on stack. Save it into the sym array for quick access.
+ffi sym curl curl_version _ptr
+load abs symarray_idx; coll append
+
+ffi sym lake lake_version _ptr
+load abs symarray_idx; coll append
+
+ffi sym lake lake_version_int _sint64
+load abs symarray_idx; coll append
+
+# extern "C" void print_ints(int32_t normal, int native, uint64_t large, int16_t ashort)
+ffi sym lake lake_print_ints _void _sint32 _sint _uint64 _sint16
+load abs symarray_idx; coll append
+
+ffi sym lake lake_print_str _void _ptr
+load abs symarray_idx; coll append
+
+# 5: tm* lake_get_tm()
+ffi sym lake lake_get_tm _ptr
+load abs symarray_idx; coll append
+
+# 6: void lake_print_tm(tm* info)
+ffi sym lake lake_print_tm _void _ptr
+load abs symarray_idx; coll append
+
+# 7: Object* doubleInt(Object*)
+ffi sym lake lake_double object object
+load abs symarray_idx; coll append
+
+# Pass a time.h tm struct, pass and return pointers to these
+# load the struct values and struct definition
+# Mon Mar 14 12:11:10 2016 (year is years since 1900, hence the sub)
+push int 10; push int 11; push int 12; push int 14; push int 2;
+push int 2016; push int 1900; sub;
+push int 1; push int 0; push int 1; push int 0; push string "gmt"
+push int 0; load abs structarray_idx; coll get
+
+# lake_print_tm(tm*)
+# ffi call will notice that first arg is a struct, so it pops the defintion, then pops the fields and does the necessary ffitype conversions
+push int 6; load abs symarray_idx; coll get
+ffi call
+
+# Get a ptr-to-struct as a return value. An array is pushed
+# to the stack containing the members.
+push int 5; load abs symarray_idx; coll get
+ffi call
+# load the struct
+push int 0; load abs structarray_idx; coll get
+# the array cast will notice there's a struct definition, so it uses that to cast what's on the stack before it
+cast array; store abs tm_result_idx
+
+# Print year (5'th tm struct member)
+push int 5; load abs tm_result_idx; coll get; push int 1900; add
+dump string "Year from FFI is: "; dump
+
+# Show entire struct array
+push int 1; load abs tm_result_idx; dump
+coll get; cast string; dump string "Timezone:"; dump
+
+# Call curl_version via libffi
+push int 0; load abs symarray_idx; coll get
+ffi call
+
+# Dump the string object containing the curl version. We must first convert
+# the raw pointer to string (assumes it's a char*)
+cast string; dump
+
+# Lake version
+push int 1; load abs symarray_idx; coll get
+ffi call
+cast string; dump
+
+# Lake version, returning int object
+push int 2; load abs symarray_idx; coll get
+ffi call
+dump string "Int version: "; dump
+
+# Lake print_ints, returns nothing
+push int -4; push int 55; push int 1003991941756381; push int 31404
+push int 3; load abs symarray_idx; coll get
+ffi call
+
+# Lake lake_print_str
+push string "Hey there, abc æøå"
+push int 4; load abs symarray_idx; coll get
+ffi call
+
+# lake_double(3) => 6
+push int 3
+push int 7; load abs symarray_idx; coll get
+ffi call
+
+dump string "Double of 3 is"; dump
+push int 6; eq; assert "Invalid result"
+
+gc

@@ -1,0 +1,46 @@
+#AUTOTEST
+
+# Recursive stacked function
+push function null; define recursive_function_idx int 0
+
+function withstack recursive
+{
+    lift 1
+
+    # Do 20 times
+    if (dup; push int 20; swap; lt)
+    {
+        # Replace dump with stdout stderr and stdin [EOL|EOF]
+        dump
+
+        # Pass argument (increment whatever we got)
+        load abs 0; inc
+        sink 1
+
+        # Remove the lifted local, we'll lift it again
+        pop
+
+        # Tail recursion => no state to preserve on stack since it's the last thing we do
+        load root recursive_function_idx; invoke tail
+    }
+    else ()
+    {
+        # Sink final count as result
+        sink 1
+    }
+
+}
+
+copy; store abs 0
+
+# Argument
+push int 0
+load abs 0; invoke
+
+push int 20; eq; assert "Expected 20"
+
+# Destruct function => stack should now be empty
+pop
+dump stack
+
+size; push int 0; eq assert "Unexpected stack size"

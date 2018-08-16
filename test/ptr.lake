@@ -1,0 +1,11 @@
+#AUTOTEST
+
+# Test pointers
+
+# Pointer values are integer literals in supported bases
+push ptr 4399492
+dump
+push ptr 0b101000010011
+dump
+push ptr 0x1f39c38AB392facc
+dump

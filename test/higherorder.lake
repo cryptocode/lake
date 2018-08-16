@@ -1,0 +1,31 @@
+#AUTOTEST
+
+# Higher-order function; takes a function arg, calls it
+
+push function abc
+{
+    # Push argument to "argfunc"
+    push int 5
+
+    # We received a function taking an int as our first (and only) argument
+    load rel -1; invoke
+}
+
+push function argfunc
+{
+    dump string "take1 called me back with an int: "
+    dump
+
+    push int 5 eq assert "Wrong value"
+}
+
+# argfunc is already on the stack, as an argument to take1. We could've
+# dup'ed, etc, but this is a fine way to implement lambdas/anon functions
+# that are passed directly as an argument => no need for stacked function,
+# since it doesn't survive after the call; no need to capture anything)
+load abs 0; invoke
+
+# The two functions (remove 2 causes GC problems)
+pop 2
+
+size; push int 0 eq assert "Unexpected stack size"

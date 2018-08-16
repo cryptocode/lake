@@ -1,0 +1,15 @@
+#AUTOTEST
+
+push int 3
+push int 4
+push int 5
+
+# Push 3 again, using top-relative load.
+load -2
+push int 3; eq; assert "Expected 3"
+
+# Push top object again
+load 0
+
+# Should be 3,4,5,5
+dump stack

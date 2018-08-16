@@ -1,0 +1,5 @@
+This directory contain prebuilt binaries for all supported 
+operating systems.
+
+During --build, a copy of the relevant binary is made, and 
+the assembly code is embedded at the end.

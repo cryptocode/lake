@@ -1,0 +1,38 @@
+#AUTOTEST
+
+# subtract(a:int, b:int): int { a-b}
+function
+{
+    dump stack
+    # The arguments are on stack
+    sub
+}
+
+# Push arguments right-to-left, since binary operations pop left-to-right
+push int 5; push int 3
+
+# Invoke the function
+load abs 0; invoke
+
+dump string "The result of 3-5 is"
+dump
+
+# Now call it again with different arguments to test that
+# everything gets cleaned up.
+
+# Push arguments
+push int 5; push int 3
+
+# Invoke the function
+load abs 0; invoke
+
+dump string "The result of sub 5-3 is"
+dump
+
+# Check the result
+push int -2 eq assert "Expected 2"
+
+clear
+dump stack
+
+gc

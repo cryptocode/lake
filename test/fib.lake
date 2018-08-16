@@ -1,0 +1,52 @@
+#AUTOTEST
+
+push function null
+
+# -------------------------------------------
+# Fibonnaci:
+#
+# (var (fib n)
+#    (? (<= n 2) 1
+#        (+ (fib (- n 2)) (fib (- n 1)))))
+# -------------------------------------------
+
+push function
+{
+    if
+    (
+        push float 2
+        load rel -1
+        le
+    )
+    {
+        push float 1
+    }
+    else
+    (
+        push bool true
+
+    )
+    {
+        # Liveness analysis should show that "float 2" literal doesn't survive passed
+        # the sub, hence it can be put on a mpf cache to avoid costly mpf_init calls. Same with mpz.
+        # Also, have pinned literal intrinics for small literals, say < 1024 (like java)
+        push float 2
+        load rel -1
+        sub
+
+        load root 0;invoke
+        push float 1
+        load rel -1
+        sub
+        load root 0;invoke
+        add
+    }
+    squash 1
+}
+store abs 0
+
+dump string "fibonnaci:"
+push float 20
+load root 0; invoke
+dump
+push float 6765; eq; assert "Invalid result"

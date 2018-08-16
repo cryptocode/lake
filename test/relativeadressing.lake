@@ -1,0 +1,38 @@
+#AUTOTEST
+
+# Test relative addressing of params and locals
+
+# This will need to be absolutely addressed (outside frame)
+push int 10
+
+function somefunc
+{
+    # Two locals at relative 0 and 1 respectively
+    push int 7
+    push int 8
+
+    # The second local
+    load rel 1 dump
+    push int 8 eq assert "Doesn't match second local variable"
+
+    # The first out of two params.
+    load rel -2 dump
+    push int 9 eq assert "Doesn't match param"
+
+    # The parent function's integer 10
+    load abs 0 dump
+    push int 10 eq assert "Doesn't match global"
+
+    # Clean up our usage
+    pop 2
+}
+
+push int 9
+push int 99
+load abs 1; invoke
+
+# Clean up two params, the push 10, the function object
+pop 4
+
+# Should be empty
+dump stack

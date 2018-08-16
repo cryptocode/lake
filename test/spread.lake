@@ -1,0 +1,39 @@
+#AUTOTEST
+
+push array 10
+
+# Add stuff to array
+push int 1; load abs 0; coll append
+push int 2; load abs 0; coll append
+push int 3; load abs 0; coll append
+
+# Start a scratch area
+commit
+
+# spread pops an array reference, spreads it on the stack
+load abs 0
+coll spread
+
+load abs 3
+push int 3; eq; assert "4'th stack item after spreading should be 3"
+
+# Restart scratch area (since commit/revert can be nested, you cannot
+# revert multiple times on the same commit)
+revert
+commit
+
+# rspread pops an array reference, spreads it on the stack in reverse. Hence,
+# the first array element will be popped first after the spreading.
+load abs 0
+
+coll rspread
+load abs 1
+push int 3; eq; assert "4'th stack item after reverse spreading should be 1"
+
+# Clean scratch area again, stack should now only contain the array
+revert
+
+push array 0; is; assert "Expected an array"
+
+# Because of the is-check above, the stack is not empty
+size; push int 0; eq; assert "Stack should be empty"

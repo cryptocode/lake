@@ -1,0 +1,5 @@
+'.source.lake':
+  'editor':
+    'commentStart': '#'
+    'increaseIndentPattern': '\\b(cond|function|(local\\s+)?function|then|do|repeat)\\b((?!end).)*$|\\{\\s*$'
+    'decreaseIndentPattern': '^\\s*(elseif|else|end|until,?|\\}\\)?).*$'

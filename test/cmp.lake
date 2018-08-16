@@ -1,0 +1,22 @@
+#AUTOTEST
+
+# Test pointer equality and type equality
+
+push string "abc"
+load abs 0
+
+# Points to the same object
+same; assert "Should point to the same object"
+
+push string "str1"
+push int 9
+
+# Different types
+is; not; assert "Should be different types"
+
+push exprlist { push int 2 }
+push exprlist { }
+
+# Note that is/same doesn't evaluate their arguments. Hence, we're only
+# check that they're the same type.
+is; assert "Not an expression list"

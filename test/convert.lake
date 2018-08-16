@@ -1,0 +1,63 @@
+#AUTOTEST
+
+# Int-to-float conversion
+push float 5
+push int 15
+cast float
+add
+dump
+
+push float 20
+eq assert "ERROR: not 20"
+
+# Float-to-int conversion
+push int 7
+push float 2
+cast int
+add
+dump
+
+push int 9
+eq assert "ERROR: not 9"
+
+# Float to String
+push float 5.42
+cast string
+dump
+
+# Int to String
+push int 95
+cast string
+dump
+
+# String to Int
+push string "0xff5ee01"
+cast int
+dump
+
+# String to Float
+push string "3.14159"
+cast float
+dump
+
+# Bool To String
+push bool true
+cast string
+dump
+
+# String to Bool
+push string "false"
+cast bool
+dump
+
+# Int to Bool
+push int 1
+cast bool
+dump
+
+# Bool to Int
+push bool true
+cast int
+dump
+
+# Equality testing for strings? ptr or strcmp?

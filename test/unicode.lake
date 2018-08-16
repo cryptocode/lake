@@ -1,0 +1,3 @@
+#AUTOTEST
+
+dump string "Unicode: 大"

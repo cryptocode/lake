@@ -1,0 +1,16 @@
+#AUTOTEST
+
+push int 2
+push int 4 # <-- top of stack
+
+# Prints 2
+dump load abs 0
+
+# Prints 2 as well
+dump load rel 0
+
+# Prints 4 (top of stack)
+dump
+
+# Make sure the references didn't ruin the stack
+push int 4 eq assert "Expected 4"

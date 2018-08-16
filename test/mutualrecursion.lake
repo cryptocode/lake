@@ -1,0 +1,56 @@
+#AUTOTEST
+
+# Mutual recursion (not co-routines with suspend), implementing a loop that counts
+# down an int Object to zero at double speed (a decrement in each function)
+#
+# This uses no stack space at all, beyond the inital argument and the two 
+# function objects.
+#
+# However, this tests an important feature in the interpreter: it doesn't
+# use stack either. A naïve implementation would call eval() on the AST node
+# for function-1, which in turn would call eval() on the AST node of
+# function-2, eventually blowing up the interpreter stack. Instead, it
+# returns a tailcallRequest down the call chain until the function exprlist
+# is found. The exprlist is then replaced with the target function's exprlist
+# and this is evaluated on the spot, without the need for an eval() call.
+#
+# This is basically as fast as using a cond loop to decrement a variable.
+
+# fn(int)
+function co1
+{
+    #dump string "co1"
+    dump
+    dec
+
+    load abs 1
+    invoke tail
+}
+
+# fn(int)
+function co2
+{
+    dec
+
+    #dump string "co2"
+    #dump stack
+
+    if (push int 0
+        load rel -1
+        gt)
+    {
+        load abs 0
+        invoke tail
+    }
+}
+
+# Start off the co-recursive tail calls
+push int 10
+load abs 0 invoke
+
+push int 0 eq assert "Counter should be 0"
+
+# Remove the two functions and we should have an empty stack
+pop 2
+
+dump stack

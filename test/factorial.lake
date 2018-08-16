@@ -1,0 +1,66 @@
+#AUTOTEST
+
+# ---------------------------
+# fact(n: int): int {
+#     if (n <= 1)
+#         1;
+#     else
+#         fact(n-1) * n;
+# }
+# ---------------------------
+
+# Where on the stack is the closure
+define factIdx int 0
+
+# Placeholder for closure instance
+push function null
+
+# Defines a function and puts an instance on the stack without evaluating it
+push function fact
+{
+    # Macro to hold the argument index. Note that define's are not scoped,
+    # but we can place them anywhere.
+    define paramN int -1
+
+    # Conditionals chain
+    # if n <= 1
+    if (push int 1; load rel paramN; le)
+    {
+        push int 1
+    }
+    else ()
+    {
+        # push n-1 as argument to fact
+        load rel paramN
+        dec
+
+        # Recursive call. No "invoke tail" here: we're not in tail position
+        # because of the load/multiplication afterwards (use CPS-style to achive this)
+        # Example of CPS tail-recursive factorial: http://www.geeksforgeeks.org/tail-recursion/
+        load abs factIdx; invoke
+
+        # push n and multiply
+        load rel paramN
+
+        mul
+    }
+
+    # Squash the parameter, keep the result
+    squash 1
+}
+
+# Pop it into the variable at given stack location
+store abs factIdx
+
+# Push local argument to compute fact(<arg>)
+push int 6
+
+# Push the closure back to the stack so we can invoke it
+load abs factIdx; invoke
+
+dump string "The factorial is:"; dump
+
+# Verify
+push int 720 eq assert "ERROR: Invalid result"
+
+dump stack

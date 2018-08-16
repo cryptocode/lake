@@ -1,0 +1,7 @@
+#AUTOTEST
+push int 5
+dup
+add
+
+dump
+push int 10 eq assert "ERROR: dup failed"

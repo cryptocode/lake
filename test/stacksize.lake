@@ -1,0 +1,20 @@
+#AUTOTEST
+
+push int 4
+push int 5
+push int 6
+
+size
+
+dump string "Size is:" dump
+push int 3 eq assert "Unexpected stack size"
+
+clear
+size
+
+dump string "Size after clear is:" dump
+push int 0 eq assert "Unexpected stack size"
+
+clear
+
+dump stack

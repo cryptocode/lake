@@ -1,0 +1,14 @@
+#AUTOTEST
+# Test macros
+
+# Build a little macro (test string concatenation as well)
+push string "push int 2; push int 3;"
+push string "add"; load abs 0; coll append
+
+# Turn the string into an expression-list we can invoke
+cast function
+invoke
+
+dump string "Value of macro evaluation is" dump
+
+push int 5 eq assert "Invalid result"

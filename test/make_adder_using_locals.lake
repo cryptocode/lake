@@ -1,0 +1,60 @@
+#AUTOTEST
+
+# This is similar to
+# http://www.paulgraham.com/accgen.html
+#   "Write a function foo that takes a number n and returns a function that takes a number i, and returns n incremented by i."
+#
+# To turn make_adder below into an accumulator, all you need to do is update n after the add
+
+# make_adder(addend: int): { (arg: int) return addend + arg; }
+function make_adder
+{
+    # PATTERN: Make room for result value (null if no expressions), start scratch area
+    push object null; commit
+
+    # This is the result of calling make_adder
+    function adder
+    {
+        # Load local "addend" from lexical parent
+        parent 1; load local 0
+        add
+    }
+    # PATTERN: after pushing a function that captures free variables, setcreator
+    # to associate with lexical parent.
+    setcreator
+
+    # PATTERN: Any argument that is captured must be stored in a local, so
+    # that nested functions can load it.
+    load rel -1
+    current; store local 0
+
+    # PATTERN: Save top stack item (the adder function) as the return value..
+    store commit
+
+    # PATTERN: Clean up scratch area
+    revert
+
+    # PATTERN: caller cleans up parameters
+}
+setcreator
+
+# PATTERN: push N arguments, call (in this case, make_adder)
+push int 5; load abs 0; invoke
+
+# PATTERN: The adder function is returned; put it in root locals
+# PATTERN: If return value is not assigned to variable, pop it
+current; store local 0
+
+# PATTERN: Remove N arguments (caller cleans)
+pop 1
+
+push int 90; current; load local 0; invoke; pop 1
+push int 90; current; load local 0; invoke; pop 1
+push int 90; current; load local 0; invoke; pop 1
+
+# Call the adder closure (which remembers 5 is the addend)
+push int 95; current; load local 0; invoke
+
+dump string "Result is " dump
+push int 100 eq assert "Unexpected result"
+dump string "STACK after adder call (should only be bound arg)"; dump stack

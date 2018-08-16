@@ -1,0 +1,8 @@
+#AUTOTEST
+push bool true
+dump
+not
+dump
+
+# Verify
+push bool false eq assert "ERROR: Expected false"

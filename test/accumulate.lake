@@ -1,0 +1,31 @@
+#AUTOTEST
+
+#-----------------------------------------------------------------------------
+# Sums integers using "accumulate"
+#
+# An accumulator takes a binary function and applies it over a variable
+# number of input argument, reducing to a single result.
+#-----------------------------------------------------------------------------
+
+# Values to sum. This is fed into a vector which is fed to std::accumulate
+# NOTE: you can also push arrays (the value count is the number of arrays, not elements, in that case)
+push int 1; push int 2; push int 3; push int 4; push int 5
+
+# Value count, so we know how many values to expect on the stack
+push int 5
+
+# Initial value for accumulation. For summing, let's start with 0
+push int 0
+
+# Accumulator which adds
+function
+{
+    add
+}
+
+# Accumulate
+accumulate
+
+dump string "Accumulate-with-sum value:"
+dump
+push int 15 eq assert "ERROR: accumulate with sum failed"

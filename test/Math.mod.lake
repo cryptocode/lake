@@ -1,0 +1,48 @@
+
+function withstack Math
+{
+    ffi lib "" lake
+
+    define Math_symarray_idx int 0
+    push array 10
+
+    define Math_pow_index int 1
+    define Math_bitwise_and_idx int 2
+    define Math_bitwise_or_idx int 3
+
+    define math_ffi_pow_idx int 0
+    define math_ffi_bitwise_and_idx int 1
+    define math_ffi_bitwise_or_idx int 2
+
+    # 0: Object* rt_math_int_pow(Object* base, Object* pow, Object* mod)
+    ffi sym lake rt_math_int_pow object object object object
+    load abs Math_symarray_idx; array append
+
+    # 1: Object* rt_math_int_bitwise_and(Object* a, Object* b)
+    ffi sym lake rt_math_int_bitwise_and object object object
+    load abs Math_symarray_idx; array append
+
+    # 2: Object* rt_math_int_bitwise_or(Object* a, Object* b)
+    ffi sym lake rt_math_int_bitwise_or object object object
+    load abs Math_symarray_idx; array append
+
+    function pow
+    {
+        push define math_ffi_pow_idx; load abs Math_symarray_idx; array get
+        ffi call
+    }
+
+    function bitwiseAnd
+    {
+        push define math_ffi_bitwise_and_idx; load abs Math_symarray_idx; array get
+        ffi call
+    }
+
+    function bitwiseOr
+    {
+        push define math_ffi_bitwise_or_idx; load abs Math_symarray_idx; array get
+        ffi call
+    }
+
+    dump string "Initialized Math module"
+}

@@ -1,0 +1,128 @@
+#AUTOTEST
+
+# ----------------------------------------------------------
+# High Level Language:
+#
+# person(age: int)
+# {
+#   getAge(): int { return age; }
+#   setAge(newage:int) ( age = newage; )
+# }
+# ----------------------------------------------------------
+
+# Where on the stack is the closure
+define personIdx int 0
+define personInstance1 int 1
+
+# Placeholder for function prototype
+push function null
+
+# Placeholder for function instance #1
+push function null
+
+# person(age: float)
+#
+# NOTE: push age by value? If so, copy the value into person's stack
+#       push by reference? If so, set age_idx -1 to reference the pushed
+#       object directly. A front-end compiler can compile to either model,
+#       or even a mix.
+#
+
+# Push a function with its own stack on the main stack. When invoking functions
+# with their own stack, the function object itself is always returned (which may
+# be switched to stack-wise to extract results)
+function withstack person
+{
+    lift 1
+    dump string "The param we lifted is..."
+    dump
+
+    # The age is a float parameter. This means age is by-reference.
+    # Note that these indices are zero-based since we're on a new stack.
+    define person_age_idx int 0
+    define person_age_set_idx int 1
+    define person_age_get_idx int 2
+
+    function age_set
+    {
+        # Update age (first argument is age)
+        store abs person_age_idx
+
+        dump string "Setting age"
+    }
+
+    function age_get
+    {
+        dump string "Getting age"
+        load abs person_age_idx
+    }
+
+    dump string "Successfully constructed person"
+    push int 999999
+}
+
+# Pop the closure into the variable at given stack location
+store abs personIdx
+
+# Push the closure back to the stack so we can create an instance and invoke it
+load abs personIdx
+dup; squash 1
+
+# Save instance in local variable
+store abs personInstance1
+
+# Push the age argument first. In this example, we're by-reference, so any
+# modifactions are reflected in this very object.
+# The person function "lifts" this object, and it's thus removed from this stack.
+push int 42
+
+# Invoking a function with its own stack will switch stacks automatically
+# The following is equivalent to calling a constructor
+load abs personInstance1; invoke
+
+# At this point, the old stack is back
+
+# Switch to the person instance. We call a bunch of methods on it without
+# switching back to the current frame. This complicates the capture of drop'ed
+# values, but it's just a test.
+load abs personInstance1; loadstack
+
+# Get age
+load abs person_age_get_idx; invoke
+
+# Is age as expected?
+push int 42; eq; assert "Unexpected value"
+
+# Transfer result (999999) to parent stack (it is pop'ed later on because it's unused)
+sink 1
+
+# Update age
+push int 50
+load abs person_age_set_idx; invoke
+
+# Get age
+load abs person_age_get_idx; invoke
+dump
+
+# Pop off get_age result and compare against 50
+push int 50 eq assert "Unexpected value"
+
+# Sink whatever the age is into the calling stack frame (the return value from getage)
+load abs person_age_idx
+sink 1
+
+dump stack
+# Go back to the main stack
+unloadstack
+
+# Because we sink'ed person_age_idx above, updated age should be on stack
+dump string "Final result:"
+dump
+
+push int 50 eq assert "Unexpected final value"
+
+# Pop off the 42 argument (unused after the age_get), as well as the function prototype and instance
+pop 3
+
+# Should be empty
+dump stack

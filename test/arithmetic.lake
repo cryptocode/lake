@@ -1,0 +1,45 @@
+#AUTOTEST
+
+# Test basic arithmetic opcodes using literals, defines and stack references.
+
+# Push an integer that we'll reference later
+push int 500
+
+# At which stack location do we find the int(500) object?
+define indexOf500 int 0
+
+# Just a literal
+define oneHundred int 100
+
+# Use a definition value directly
+push define oneHundred
+push int 5
+add
+dump
+
+push int 105 eq assert "ERROR: add failed"
+
+# Push the object at stack location
+
+push int 5
+load abs indexOf500
+sub
+dump
+
+push int 495 eq assert "ERROR: sub failed"
+
+# Two literals
+push int 100
+push int 5
+mul
+dump
+
+push int 500 eq assert "ERROR: mul failed"
+
+# Literal and defined value
+push define oneHundred
+push int 1000
+div
+dump
+
+push int 10 eq assert "ERROR: div failed"

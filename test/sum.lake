@@ -1,0 +1,19 @@
+#AUTOTEST
+
+# Test float comparison using default epsilon (DBL_EPSILON)
+#
+# NOTE: The "eq" test below is true because the default epsilon
+# is 1.11e-16 (0.000000000000000111)
+#
+# You can make this test fail by setting epsilon and/or precision, e.g
+#   epsilon 0.00000000000000000001
+
+# For truly large numbers, you can experiment with setting minimum precision as well:
+#   precision 1024
+
+push float 0.10000000000000000000301
+push float 0.20000000000000000002401
+add
+push float 0.30000000000000001
+
+eq; assert "Invalid float sum"

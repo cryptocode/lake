@@ -1,0 +1,55 @@
+#AUTOTEST
+
+# doublenum
+push function null
+# filter
+push function null; define filter_idx int 1
+# result array
+push array 10; define array_idx int 2
+# counter
+push int 0; define count_idx int 3
+# currently generated value
+push int 0; define generated_idx int 4
+
+# List producer
+push function doublenum
+{
+    push int 2
+    mul
+}
+store abs 0
+
+# List filter (skip number 30)
+push function filter
+{
+    push int 30
+    ne
+}
+store abs filter_idx
+
+if (push int 100; load abs count_idx; lt)
+{
+    load abs count_idx; load abs 0; invoke
+    store abs generated_idx
+
+    # Check filter
+    if (load abs generated_idx; load abs filter_idx; invoke;)
+    {
+        load abs generated_idx; load abs array_idx;
+        coll append
+    }
+
+    load abs count_idx; inc; store abs count_idx
+
+    repeat
+}
+
+dump string "Even numbers < 200, except 30"
+load abs array_idx; dump; pop
+
+# Make sure we filtered out 30 (the 15'th element)
+push int 15; load abs array_idx; coll get
+push int 32; eq; assert "Should be 32"
+
+# Should have our 5 locals
+dump stack

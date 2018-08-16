@@ -1,0 +1,109 @@
+#AUTOTEST
+
+# This is similar to
+# http://www.paulgraham.com/accgen.html
+#   "Write a function foo that takes a number n and returns a function that takes a number i, and returns n incremented by i."
+#
+# To turn make_adder below into an accumulator, all you need to do is update n after the add
+
+define liftCount int 1
+
+# The adder instance is placed here
+push function null
+
+# make_adder(addend: int): { (arg: int) return addend + arg; }
+function make_adder
+{
+    # adder instance placeholder (at rel location #1)
+    push function null
+
+    dump string "make_adder stack:"
+    dump stack
+
+    # This is the result of calling make_adder
+    function withstack adder
+    {
+        # make_adder's param was liftet here, to abs 0
+
+        # Now lets lift the argument, say adder(9), to abs 1
+        # we could simply say "lift 1", but let's do it the fancy way, to test
+        #push define liftCount
+        lift 1
+
+        # Our captured argument is now the first local. We must push it again
+        # for add (so adder can be called multiple times.)
+        load abs 0
+        # Also push the lifted adder(N) argument for add
+        load abs 1
+
+        add
+
+        # Uncomment to turns us into an accumulator ala Graham. This would
+        # update the bound argument.
+        # dup; store abs 0
+
+        # Sink the result to calling stack
+        sink 1
+
+        # Yank the add result
+        pop 1
+        dump string "STACK after adder call (should only be bound arg)"; dump stack
+    }
+
+    # Create new instance of adder
+    dup; store rel 0
+
+    # Push our arg, we're going to lift it into adder's stack
+    load rel -1
+    dump string "make_adder arg is passed on: " dump
+
+    # Load adder's stack and inject the make_adder's argument (this is like setting an object field)
+    # A front-end would do this for all captured arguments
+    load rel 0; loadstack
+    lift 1
+    unloadstack; pop
+
+    # Push the adder function as the return value
+    load rel 0
+    dump string "local func: " dump
+}
+
+# Call make_adder
+push int 5
+load abs 1; invoke
+dump string "make_adder returned: " dump
+# The adder function is returned; put it on the root stack
+store abs 0
+
+# Call the adder closure (which remembers 5 is the addend)
+push int 95
+load abs 0; invoke
+dump string "Result is " dump
+push int 100 eq assert "Unexpected result"
+
+# Call the adder closure (which remembers 5 is the addend)
+push int 3
+load abs 0 invoke
+dump string "Result is " dump
+push int 8 eq assert "Unexpected result"
+
+# Clean up (we clean up the param in this case, in addition to the eq test result
+# and the function prototype and its instance)
+pop 4
+
+gc
+
+dump stack
+dump sweeplist
+
+# Try allocating from the freelist; it should have 3 entries now
+dump freelist
+push int 31
+dup; dup; dup
+
+# And now it should be empty because the dup's above allocated (push int 3 is a pinned literal)
+dump freelist
+
+pop 2
+gc
+dump sweeplist

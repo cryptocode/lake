@@ -1,0 +1,43 @@
+#AUTOTEST
+push uset 10
+push function null
+push int 33
+
+push function withstack Data
+{
+    push string "Data member 1"
+    push string "Data member 2"
+
+    # Second local (33) in first parent
+    load parent 2 1
+
+    # Same, using root
+    load root 2
+    push int 100
+    add #133
+}
+
+# Create new instance of Data
+copy; store abs 1
+load abs 1; invoke
+
+# Make a reference copy
+# And put it in the set
+load abs 1; load abs 0; coll put
+
+push string "Abc"; load abs 0; coll put
+push string "Testing testing"; load abs 0; coll put
+push int 492; load abs 0; coll put
+push float 3.14159; load abs 0; coll put
+
+# Get the item "Testing testing"
+push string "Testing testing"; load abs 0; coll get; dump
+
+# Load the function from the set
+load abs 1; load abs 0; coll get;
+
+# Dump contents of Data
+loadstack; dump stack; unloadstack
+
+load abs 1; load abs 0; coll del;
+load abs 0; dump string "Set after deleting function:" dump

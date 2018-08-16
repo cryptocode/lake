@@ -1,0 +1,40 @@
+#AUTOTEST
+
+# TEST MODULES
+
+# Math module placeholder. If you import tons of modules, you can
+# also store the module functions in an array.
+define mod_math int 0
+
+# push object null crashes
+push function null
+
+# Load the module, make a stacked instance and store it in the placeholder
+load module "test/Math"; copy; store abs mod_math
+
+# Initalize module
+load abs mod_math; invoke
+
+# Call a few module functions
+load abs mod_math; loadstack
+
+    # POW (last arg is modulus)
+    push int 7; push int 3; push int 100000000000000
+    load abs Math_pow_index; invoke
+
+    # Need a print/println API that takes objects
+    dump string "pow(7,3) is"; dump
+    push int 343; eq; assert "Unexpected pow result"
+
+    # AND
+    push int 9; push int 3
+    load abs Math_bitwise_and_idx; invoke
+    dump string "9 & 3 is"; dump
+    push int 1; eq; assert "Unexpected and result"
+
+    # OR
+    push int 8; push int 3
+    load abs Math_bitwise_or_idx; invoke
+    dump string "8 | 3 is"; dump
+    push int 11; eq; assert "Unexpected or result"
+unloadstack

@@ -1,0 +1,24 @@
+#AUTOTEST
+
+push int 1
+push int 2
+push int 3
+
+# Mark the stack location so we can revert to it later
+commit
+
+# Some scratch work
+push int 4
+push int 5
+push string "Going away soon"
+
+# Update the top stack location before the commit
+push int 33; store commit
+
+# Revert stack size, keep any changes (3 => 33)
+revert
+dump stack
+
+# Verify
+size; push int 3; eq; assert "Invalid stack size"
+load abs 2; push int 33; eq; assert "Commit point not updated correctly"

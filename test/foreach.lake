@@ -1,0 +1,91 @@
+#AUTOTEST
+push umap 10
+push array 10
+push uset 10
+push string "Collection of chars"
+push pair
+
+push string "key1" push int 23
+load abs 0; coll append
+
+push string "key2" push int 24
+load abs 0; coll append
+
+push int 485 push string "String value"
+load abs 0; coll append
+
+load abs 0; dump; pop
+
+dump string "------------"
+
+# Foreach loop. For maps, each iteration pushes
+# the key and value.
+dump string "Map iteration"
+load abs 0; foreach
+{
+    # forach on maps pushes key first, then value. Let's print key first, so swap.
+    swap
+    # Key
+    dump; pop
+    # Value
+    dump; pop
+}
+
+dump string "------------"
+
+# ARRAY
+
+push int 5; load abs 1; coll append
+push string "Hello"; load abs 1; coll append
+push float 3.14159; load abs 1; coll append
+
+dump string "Array iteration:"
+load abs 1; foreach
+{
+    dump; pop
+}
+
+dump string "------------"
+
+# SET
+
+push string "setitem1"; load abs 2; coll append
+push string "setitem2"; load abs 2; coll append
+push string "setitem3"; load abs 2; coll append
+push string "setitem1"; load abs 2; coll append
+push string "setitem1"; load abs 2; coll append
+
+# Should only contain setitem1,2,3 since sets have unique keys
+dump string "Set iteration:"
+load abs 2; foreach
+{
+    dump; pop
+}
+
+dump string "------------"
+
+# PAIRS
+
+push int 1; push string "second"; load abs 4; coll append
+dump string "Pair iteration"
+load abs 4; foreach
+{
+    dump; pop
+}
+
+dump string "------------"
+
+# STRING
+
+push char '!'; load abs 3; coll append
+load abs 3; dump
+push char 'g' load abs 3; coll contains; dump string "Contains letter g?" dump;pop
+push char 'r' load abs 3; coll contains; dump string "Contains letter r?" dump;pop
+
+dump string "String iteration:"
+load abs 3; foreach
+{
+    dump; pop
+}
+
+dump stack

@@ -1,0 +1,110 @@
+#AUTOTEST
+
+# Test exception handling and stress GC
+
+define protoIdx int 0
+define instance1 int 1
+define exceptionarr int 2
+
+# Placeholder for function prototype
+push function null
+
+# Placeholder for function instance #1
+push function null
+
+# Global exception stack. We don't even need special vm support to implement exceptions
+# beyond unwind/checkpoint. In this case, we use a simple array of
+# strings to represent exceptions. A frontend can do anything, including
+# arrays of exception objects (stacked functions)
+push array 10
+
+function withstack filething
+{
+    define filething_checkfile_idx int 1
+    define filething_callcheck_idx int 2
+    define filething_openfile_idx int 3
+
+    function handleFileError
+    {
+        dump string "File error!"
+    }
+
+    function checkfile
+    {
+        # Can raise any object, including function objects (maybe representing exception objects in HLL)
+        # An implementation can use a single global object, an FFI call, whatver, to
+        # implement exceptions. We use an array.
+        push string "Up to no good"
+        load parent exceptionarr 1; array append
+
+        #gc
+
+        # Throw an exception
+        unwind
+
+        push string "Unreachable CODE!"; dump
+    }
+
+    # This tests propagation of error flag. We call checkfile, which fails, but
+    # we don't have an error flag.
+    function callcheck
+    {
+        load abs filething_checkfile_idx; invoke
+
+        dump string "This should not be called, since checkfile fails"
+    }
+
+    function openfile
+    {
+        dump string "Calling openfile"
+
+        # Load handleFileError, set as error handler
+        #load abs 0
+
+        # This will fail. On error, it pops an handler all calls it. "raise" in a handler pops again, calling the next, ad infinitum
+        load abs filething_callcheck_idx; invoke
+
+        dump string "This will not be called, because the above invoke threw!"
+
+        # Exception handler
+        checkpoint
+
+        if (load parent exceptionarr 1; array size; push int 0; gt)
+        {
+            dump string "Oh noes!!! exception:"; load parent exceptionarr 1; dump
+            # Clear array to stop propagating exception objects. Uncomment to propagate to main()
+            load parent exceptionarr 1; array clear
+            #gc
+        }
+        else()
+        { dump string "All is good, no exception!" }
+    }
+
+    dump string "Created filething instance"
+}
+
+store abs protoIdx;
+
+function main
+{
+    # Create an instance (we copy because we don't need the prototype anymore,
+    # just an instance. Usually, use 'dup'... just testing here)
+    load abs protoIdx; copy; store abs instance1
+
+    # Construct
+    load abs instance1; invoke
+
+    # Call member that fails
+    load abs instance1; loadstack
+    load abs filething_openfile_idx; invoke
+
+    load parent exceptionarr 1; array size
+    if (push int 0; gt)
+    { dump string "MAIN: Oh noes, unhandled exception"}
+    else ()
+    { dump string "MAIN: All is good, no unhandled exceptions!"}
+
+
+}
+
+invoke

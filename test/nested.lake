@@ -1,0 +1,19 @@
+#AUTOTEST
+
+# Push outer function on the stack
+function
+{
+    # Inner function
+    function child
+    {
+        dump string "in child"
+    }
+
+    dump string "calling child"
+    load rel 0
+    invoke
+    dump string "back in parent"
+}
+
+# Invoke function on stack
+invoke

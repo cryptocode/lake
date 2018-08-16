@@ -1,0 +1,34 @@
+#AUTOTEST
+define local_a int 0
+define local_b int 1
+
+push function null
+function
+{
+    dump string "   Inside: Local a is now (2)"
+    current; load local local_a; dump
+
+    dump string "   Inside: Local b is now (2)"
+    current; load local local_b; dump
+
+
+    push int 1011; current; store local local_a
+}
+store abs 0
+
+# Set some local variables
+push int 101; load abs 0; store local local_a
+push int 102; load abs 0; store local local_b
+
+dump string "Local a is now (1)"
+load abs 0; load local local_a; dump
+
+# Call the function - it will update local_a
+load abs 0; invoke
+
+dump string "Local a is now (3)"
+load abs 0; load local local_a; dump
+
+# Verify
+load abs 0; load local local_a;
+push int 1011; eq; assert "Invalid local value"

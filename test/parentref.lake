@@ -1,0 +1,53 @@
+#AUTOTEST
+
+function withstack aparent
+{
+    push int 55
+    push int 44
+    push int 33
+
+    dump string "Created parent"
+
+    function nestedNoStack
+    {
+        # Easy enough, we're part of the same stack as "parent"
+        # so simply reference it
+        dump load abs 0
+    }
+
+    function withstack nested
+    {
+        push int 101
+        push int 202
+        push int 303
+
+        dump string "Created nested"
+
+        dump string "The local variable in parent stack is: "
+
+        load parent 0 1 # First local (0) in parent stack (1) (result=55)
+        dump
+        load abs 1   # absolute load (202)
+        dump
+        load rel 1   # frame-relative load (202, same as abs, because rel == abs in stacked functions SO WHY HAVE REL/ABS? well to be able to address non-framed locations in non-stacked functions)
+        dump
+
+        # Update stack variable in parent (44->4444)
+        push int 4444
+        store parent 1 1
+
+        dump string "Done in nested"
+    }
+
+    # nestedNoStack
+    load abs 4
+    dup
+    invoke
+
+    # The second param should've been updated by nested
+    dump string "Updated 44->4444 ?"
+}
+
+# create temporary (we don't save the dup in a local) and invoke
+load abs 0
+dup; invoke

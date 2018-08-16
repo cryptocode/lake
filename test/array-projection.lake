@@ -1,0 +1,45 @@
+#AUTOTEST
+
+# Array
+push array 10
+
+# Projection
+push object null
+
+# Fill array with 1..5
+push int 1; load abs 0; coll append
+push int 2; load abs 0; coll append
+push int 3; load abs 0; coll append
+push int 4; load abs 0; coll append
+push int 5; load abs 0; coll append
+
+# Create a projection
+
+# Except the last one
+push int 1
+# Except the two first
+push int 2
+# The collection
+load abs 0
+
+coll projection
+store abs 1
+
+# --- ITERATE
+dump string "Array projection iteration (should print 3 and 4):"
+load abs 1; foreach
+{
+    dump; pop
+}
+
+# --- GET
+dump string "First item in projection:"
+push int 0; load abs 1; coll get; dump
+
+# --- PUT/CLEAR/DEL (mutation) is not allowed on projections (uncomment to see exception)
+# load abs 1; coll put
+
+# --- dup/copy (makes a real array of the projection)
+dump string "Materialized projection:"
+load abs 1; dup
+dump

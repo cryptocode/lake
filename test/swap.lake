@@ -1,0 +1,6 @@
+#AUTOTEST
+push int 3
+push int 2
+swap; sub; dump
+
+push int 1 eq assert "Should be 3-2=1 after swap"

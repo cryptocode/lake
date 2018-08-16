@@ -1,0 +1,8 @@
+#AUTOTEST
+push int 18
+dump
+neg
+dump
+
+# Assert
+push int -18 eq assert "Unexpected stack value"

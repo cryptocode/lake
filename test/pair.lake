@@ -1,0 +1,16 @@
+#AUTOTEST
+
+push pair
+
+push int 1; push string "second"
+load abs 0; coll append
+
+dump string "The pair is:"
+load abs 0; dump
+
+dump string "First element is:"
+push int 0; load abs 0; coll get; dump
+dump string "Second element is:"
+push int 1; load abs 0; coll get; dump
+
+push string "second"; eq; assert "Unexpected value"

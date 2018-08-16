@@ -1,0 +1,21 @@
+#AUTOTEST
+# Test top-relative store
+
+push int 123
+push int 234
+push int 345
+
+# Make a copy of 345, pop-and-store into top-1
+dup
+store -1
+
+# Make a copy of 345, pop-and-store into top-2
+dup
+store -2
+
+# All items should now be 345
+dump stack
+
+load abs 0; push int 345 eq assert "Invalid stack contents"
+load abs 1; push int 345 eq assert "Invalid stack contents"
+load abs 2; push int 345 eq assert "Invalid stack contents"
